@@ -1,0 +1,3 @@
+[submodule "libraries/LedControl"]
+	path = libraries/LedControl
+	url = https://github.com/wayoda/LedControl
