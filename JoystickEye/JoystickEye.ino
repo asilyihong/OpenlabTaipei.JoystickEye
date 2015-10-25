@@ -14,8 +14,11 @@
 #define Y_PIN   A0
 #define BTN_PIN  2
 
+/* Animate interval */
+#define ANIM_IVL 2000
+
 /* define eyeball count */
-#define EYEBALL_CNT  1
+#define EYEBALL_CNT  2
 LedControl lc = LedControl(PIN_EYES_DIN, PIN_EYES_CLK, PIN_EYES_CS, EYEBALL_CNT);
 /* rotation */
 bool rotateMatrix0 = false; /* rotate 0 matrix by 180 deg */
@@ -38,13 +41,26 @@ int currentX;
 int currentY;
 int cntLoop = 0;
 int cntEffect = 0;
-#define DELAY_BLINK 40
 /* min and max positions */
 #define MIN -2
 #define MAX 2
+int prevXPosition = 0;
+int prevYPosition = 0;
 int xPosition = 0;
 int yPosition = 0;
 int buttonState = 0;
+boolean noMove = false;
+
+unsigned long currTime = 0;
+unsigned long nextAnimTime = 0;
+
+boolean animMode = false;
+int animTypeIndex = -1;
+int animLvlIndex = -1;
+int animIndex = -1;
+
+boolean blinkLeft = false;
+boolean blinkRight = false;
 
 /*
    Arduino setup
@@ -107,6 +123,7 @@ void setup()
     Serial.begin(9600);
 
     delay(1000);
+    currTime = millis();
 }
 
 /*
@@ -118,19 +135,55 @@ void loop()
     yPosition = map(analogRead(Y_PIN), 0, 1024, MIN, MAX + 1);
     buttonState = digitalRead(BTN_PIN);
 
-    if (!buttonState)
+    currTime = millis();
+
+    noMove = (xPosition == prevXPosition) && (yPosition == prevYPosition);
+    if (!noMove || !buttonState)
     {
-        blinkEyes(true, true);
+        animMode = false;
+        prevXPosition = xPosition;
+        prevYPosition = yPosition;
+    }
+    if (animMode)
+    {
+        if (nextAnimTime < currTime)
+        {
+//            Serial.print("nextAnimTime: ");
+//            Serial.println(nextAnimTime);
+            switch (animTypeIndex)
+            {
+            case 0:
+                blinkLeft = true;
+                blinkRight = false;
+                blinkEyes();
+                break;
+            case 1:
+                blinkLeft = false;
+                blinkRight = true;
+                blinkEyes();
+                break;
+            case 2:
+                blinkLeft = true;
+                blinkRight = true;
+                blinkEyes();
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    else if (!buttonState)
+    {
+        animMode = true;
+        animTypeIndex = 0;
+        animLvlIndex = 0;
+        animIndex = 0;
+        nextAnimTime = currTime;
     } 
-    else
+    else if (!noMove)
     {
         displayEyes(xPosition, yPosition);
-//        Serial.print("X: ");
-//        Serial.print(xPosition);
-//        Serial.print(" | Y: ");
-//        Serial.println(yPosition);
     }
-    delay (100);
 }
 /*
    This method corrects provided coordinate value
@@ -151,6 +204,7 @@ int getValidValue(int value)
  */
 void displayEyes(int offsetX, int offsetY)
 {
+//    Serial.println("displayEyes");
     // ensure offsets are in valid ranges
     offsetX = getValidValue(offsetX);
     offsetY = getValidValue(offsetY);
@@ -198,46 +252,6 @@ void displayEyes(int offsetX, int offsetY)
     currentY = offsetY;
 }
 /*
-   This method blinks eyes as per provided params
- */
-void blinkEyes(boolean blinkLeft, boolean blinkRight)
-{
-    // blink?
-    if (!blinkLeft && !blinkRight)
-        return;
-    // close eyelids
-    for (int i=0; i<=3; i++)
-    {
-        if (blinkLeft)
-        {
-            setRow(0, i, 0);
-            setRow(0, 7-i, 0);
-        }
-        if (blinkRight)
-        {
-            setRow(1, i, 0);
-            setRow(1, 7-i, 0);
-        }
-        delay(DELAY_BLINK);
-    }
-    delay(DELAY_BLINK);
-    // open eyelids
-    for (int i=3; i>=0; i--)
-    {
-        if (blinkLeft)
-        {
-            setRow(0, i, eyeCurrent[i]);
-            setRow(0, 7-i, eyeCurrent[7-i]);
-        }
-        if (blinkRight)
-        {
-            setRow(1, i, eyeCurrent[i]);
-            setRow(1, 7-i, eyeCurrent[7-i]);
-        }
-        delay(DELAY_BLINK);
-    }
-}
-/*
    This method sets values to matrix row
    Performs 180 rotation if needed
  */
@@ -277,4 +291,10 @@ byte bitswap (byte x)
             : [out] "=r" (result) : [in] "r" (x));
     return(result);
 }
-
+void nextAnim()
+{
+    animIndex = 0;
+    animLvlIndex = 0;
+    nextAnimTime = currTime + ANIM_IVL;
+    animTypeIndex++;
+}
