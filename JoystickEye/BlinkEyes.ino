@@ -6,49 +6,49 @@ void blinkEyes()
 {
     switch(animLvlIndex)
     {
-        case 0:
-            if (blinkLeft)
-            {
-                setRow(0, animIndex, 0);
-                setRow(0, 7 - animIndex, 0);
-            }
+    case 0:
+        if (blinkLeft)
+        {
+            setRow(0, animIndex, 0);
+            setRow(0, 7 - animIndex, 0);
+        }
 #if (EYEBALL_CNT == 2)
-            if (blinkRight)
-            {
-                setRow(1, animIndex, 0);
-                setRow(1, 7 - animIndex, 0);
-            }
+        if (blinkRight)
+        {
+            setRow(1, animIndex, 0);
+            setRow(1, 7 - animIndex, 0);
+        }
 #endif
-            nextAnimTime = currTime + DELAY_BLINK;
-            animIndex++;
-            if (animIndex == 4)
-            {
-                animLvlIndex++;
-                nextAnimTime += DELAY_BLINK * 2;
-            }
-            break;
-        case 1:
-            animIndex--;
-            if (blinkLeft)
-            {
-                setRow(0, animIndex, eyeCurrent[animIndex]);
-                setRow(0, 7 - animIndex, eyeCurrent[7 - animIndex]);
-            }
+        nextAnimTime = currTime + DELAY_BLINK;
+        animIndex++;
+        if (animIndex == 4)
+        {
+            animLvlIndex++;
+            nextAnimTime += DELAY_BLINK * 2;
+        }
+        break;
+    case 1:
+        animIndex--;
+        if (blinkLeft)
+        {
+            setRow(0, animIndex, eyeCurrent[animIndex]);
+            setRow(0, 7 - animIndex, eyeCurrent[7 - animIndex]);
+        }
 #if (EYEBALL_CNT == 2)
-            if (blinkRight)
-            {
-                setRow(1, animIndex, eyeCurrent[animIndex]);
-                setRow(1, 7 - animIndex, eyeCurrent[7 - animIndex]);
-            }
+        if (blinkRight)
+        {
+            setRow(1, animIndex, eyeCurrent[animIndex]);
+            setRow(1, 7 - animIndex, eyeCurrent[7 - animIndex]);
+        }
 #endif
-            nextAnimTime = currTime + DELAY_BLINK;
-            if (animIndex == 0)
-            {
-                nextAnim();
-            }
-            break;
-        default:
-            animTypeIndex = -1;
-            return;
+        nextAnimTime = currTime + DELAY_BLINK;
+        if (animIndex == 0)
+        {
+            nextAnim();
+        }
+        break;
+    default:
+        animTypeIndex = -1;
+        return;
     }
 }

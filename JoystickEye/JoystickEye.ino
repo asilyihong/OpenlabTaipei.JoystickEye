@@ -14,11 +14,17 @@
 #define Y_PIN   A0
 #define BTN_PIN  2
 
-/* Animate interval */
+/* Animate constance */
 #define ANIM_IVL 2000
+#define ANIM_IDX_MAX 3
 
 /* define eyeball count */
 #define EYEBALL_CNT  2
+#if (EYEBALL_CNT == 2)
+# define MIN_ANIM    0
+#else
+# define MIN_ANIM    1
+#endif
 LedControl lc = LedControl(PIN_EYES_DIN, PIN_EYES_CLK, PIN_EYES_CS, EYEBALL_CNT);
 /* rotation */
 bool rotateMatrix0 = false; /* rotate 0 matrix by 180 deg */
@@ -153,19 +159,22 @@ void loop()
             switch (animTypeIndex)
             {
             case 0:
-                blinkLeft = true;
-                blinkRight = false;
+                blinkLeft = false;
+                blinkRight = true;
                 blinkEyes();
                 break;
             case 1:
-                blinkLeft = false;
-                blinkRight = true;
+                blinkLeft = true;
+                blinkRight = false;
                 blinkEyes();
                 break;
             case 2:
                 blinkLeft = true;
                 blinkRight = true;
                 blinkEyes();
+                break;
+            case 3:
+                crossEyes();
                 break;
             default:
                 break;
@@ -175,7 +184,7 @@ void loop()
     else if (!buttonState)
     {
         animMode = true;
-        animTypeIndex = 0;
+        animTypeIndex = MIN_ANIM;
         animLvlIndex = 0;
         animIndex = 0;
         nextAnimTime = currTime;
@@ -295,6 +304,19 @@ void nextAnim()
 {
     animIndex = 0;
     animLvlIndex = 0;
-    nextAnimTime = currTime + ANIM_IVL;
     animTypeIndex++;
+
+    if (animTypeIndex <= 2)
+    {
+        nextAnimTime = currTime + 100;
+    }
+    else
+    {
+        nextAnimTime = currTime + 500 + random(ANIM_IVL);
+    }
+    if (animTypeIndex > ANIM_IDX_MAX)
+    {
+        animTypeIndex = MIN_ANIM;
+    }
 }
+
