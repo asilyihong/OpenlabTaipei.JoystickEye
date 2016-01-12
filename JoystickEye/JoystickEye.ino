@@ -17,6 +17,7 @@
 /* Animate constance */
 #define ANIM_IVL 2000
 #define ANIM_IDX_MAX 3
+#define ANIM_MOVE   99
 
 /* define eyeball count */
 #define EYEBALL_CNT  2
@@ -61,6 +62,7 @@ unsigned long currTime = 0;
 unsigned long nextAnimTime = 0;
 
 boolean animMode = false;
+int currAnimTypeIndex = -1;
 int animTypeIndex = -1;
 int animLvlIndex = -1;
 int animIndex = -1;
@@ -68,24 +70,21 @@ int animIndex = -1;
 boolean blinkLeft = false;
 boolean blinkRight = false;
 
-/*
-   Arduino setup
- */
+/* Arduino setup */
 void setup()
 {
-    // MAX72XX is in power-saving mode on startup, we have to do a wakeup call
+    /* MAX72XX is in power-saving mode on startup, we have to do a wakeup call */
     lc.shutdown(0,false);
-    // set the brightness to low
+    /* set the brightness to low */
     lc.setIntensity(0,1);
-    // clear both modules
+    /* clear both modules */
     lc.clearDisplay(0);
 #if (EYEBALL_CNT == 2)
     lc.shutdown(1,false);
     lc.setIntensity(1,1);
     lc.clearDisplay(1);
 #endif
-    // LED test
-    // vertical line
+    /* LED test vertical line */
     byte b = B10000000;
     for (int c=0; c<=7; c++)
     {
@@ -132,9 +131,7 @@ void setup()
     currTime = millis();
 }
 
-/*
-   Arduino loop
- */
+/* Arduino loop */
 void loop()
 {
     xPosition = map(analogRead(X_PIN), 0, 1024, MIN, MAX + 1);
@@ -154,8 +151,6 @@ void loop()
     {
         if (nextAnimTime < currTime)
         {
-//            Serial.print("nextAnimTime: ");
-//            Serial.println(nextAnimTime);
             switch (animTypeIndex)
             {
             case 0:
@@ -176,6 +171,9 @@ void loop()
             case 3:
                 crossEyes();
                 break;
+            case ANIM_MOVE:
+                moveEyesLoop();
+                break;
             default:
                 break;
             }
@@ -184,19 +182,20 @@ void loop()
     else if (!buttonState)
     {
         animMode = true;
-        animTypeIndex = MIN_ANIM;
+        currAnimTypeIndex = MIN_ANIM;
+        animTypeIndex = currAnimTypeIndex;
         animLvlIndex = 0;
         animIndex = 0;
         nextAnimTime = currTime;
     } 
     else if (!noMove)
     {
+        /* Move via Joystick */
         displayEyes(xPosition, yPosition);
     }
 }
-/*
-   This method corrects provided coordinate value
- */
+
+/* This method corrects provided coordinate value */
 int getValidValue(int value)
 {
     if (value > MAX)
@@ -213,17 +212,15 @@ int getValidValue(int value)
  */
 void displayEyes(int offsetX, int offsetY)
 {
-//    Serial.println("displayEyes");
-    // ensure offsets are in valid ranges
+    /* ensure offsets are in valid ranges */
     offsetX = getValidValue(offsetX);
     offsetY = getValidValue(offsetY);
-    // calculate indexes for pupil rows (perform offset Y)
+    /* calculate indexes for pupil rows (perform offset Y) */
     int row1 = 3 - offsetY;
     int row2 = 4 - offsetY;
-    // define pupil row
+    /* define pupil row */
     byte pupilRow = eyePupil;
-    // perform offset X
-    // bit shift and fill in new bit with 1
+    /* perform offset X, bit shift and fill in new bit with 1 */
     if (offsetX > 0) {
         pupilRow = pupilRow >> offsetX;
     }
@@ -231,10 +228,10 @@ void displayEyes(int offsetX, int offsetY)
         pupilRow = pupilRow << (-offsetX);
     }
     pupilRow = pupilRow ^ B11111111;
-    // pupil row cannot have 1s where eyeBall has 0s
+    /* pupil row cannot have 1s where eyeBall has 0s */
     byte pupilRow1 = pupilRow & eyeBall[row1];
     byte pupilRow2 = pupilRow & eyeBall[row2];
-    // display on LCD matrix, update to eyeCurrent
+    /* display on LCD matrix, update to eyeCurrent */
     for(int r=0; r<8; r++)
     {
         if (r == row1)
@@ -256,14 +253,12 @@ void displayEyes(int offsetX, int offsetY)
             eyeCurrent[r] = eyeBall[r];
         }
     }
-    // update current X and Y
+    /* update current X and Y */
     currentX = offsetX;
     currentY = offsetY;
 }
-/*
-   This method sets values to matrix row
-   Performs 180 rotation if needed
- */
+
+/* This method sets values to matrix row Performs 180 rotation if needed */
 void setRow(int addr, int row, byte rowValue)
 {
     if (((addr == 0) && (rotateMatrix0)) || (addr == 1 && rotateMatrix1))
@@ -273,10 +268,8 @@ void setRow(int addr, int row, byte rowValue)
     }
     lc.setRow(addr, row, rowValue);
 }
-/*
-   Reverse bits in byte
-http://www.nrtm.org/index.php/2013/07/25/reverse-bits-in-a-byte/
- */
+
+/* Reverse bits in byte http://www.nrtm.org/index.php/2013/07/25/reverse-bits-in-a-byte/ */
 byte bitswap (byte x)
 {
     byte result;
@@ -300,23 +293,33 @@ byte bitswap (byte x)
             : [out] "=r" (result) : [in] "r" (x));
     return(result);
 }
+
 void nextAnim()
 {
     animIndex = 0;
     animLvlIndex = 0;
-    animTypeIndex++;
-
-    if (animTypeIndex <= 2)
+    if (animTypeIndex == ANIM_MOVE)
     {
+        currAnimTypeIndex++;
+        nextAnimTime = currTime + 500 + random(ANIM_IVL);
+        if (currAnimTypeIndex > ANIM_IDX_MAX)
+        {
+            currAnimTypeIndex = MIN_ANIM;
+        }
+        animTypeIndex = currAnimTypeIndex;
+    }
+    else if (animTypeIndex == 0)
+    { /* blink right eye */
         nextAnimTime = currTime + 100;
+        currAnimTypeIndex++;
+        animTypeIndex = currAnimTypeIndex;
     }
     else
     {
         nextAnimTime = currTime + 500 + random(ANIM_IVL);
+        animTypeIndex = ANIM_MOVE;
+        moveEyesInit(random(MIN, MAX + 1), random(MIN, MAX + 1), 50, false);
     }
-    if (animTypeIndex > ANIM_IDX_MAX)
-    {
-        animTypeIndex = MIN_ANIM;
-    }
+
 }
 

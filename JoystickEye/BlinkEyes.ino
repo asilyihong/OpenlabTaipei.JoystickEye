@@ -1,7 +1,5 @@
 #define DELAY_BLINK 40
-/*
-   This method blinks eyes as per provided params
- */
+/* This method blinks eyes as per provided params */
 void blinkEyes()
 {
     switch(animLvlIndex)
@@ -48,7 +46,6 @@ void blinkEyes()
         }
         break;
     default:
-        animTypeIndex = -1;
         return;
     }
 }

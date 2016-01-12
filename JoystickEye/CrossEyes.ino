@@ -1,6 +1,4 @@
-/*
-   This method crosses eyes
- */
+/* This method crosses eyes */
 byte pupilR = eyePupil;
 byte pupilL = eyePupil;
 void crossEyes()
