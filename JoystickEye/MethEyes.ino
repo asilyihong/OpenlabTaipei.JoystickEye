@@ -1,5 +1,5 @@
-/* This method crosses eyes */
-void crossEyes()
+/* This method meth eyes */
+void methEyes()
 {
     switch(animLvlIndex)
     {
@@ -12,11 +12,11 @@ void crossEyes()
         moveEyesLoop();
         break;
     case 2:
-        pupilR = pupilR >> 1;
+        pupilR = pupilR << 1;
         setRow(0, 3, pupilR ^ B11111111);
         setRow(0, 4, pupilR ^ B11111111);
 #if (EYEBALL_CNT == 2)
-        pupilL = pupilL << 1;
+        pupilL = pupilL >> 1;
         setRow(1, 3, pupilL ^ B11111111);
         setRow(1, 4, pupilL ^ B11111111);
 #endif
@@ -30,11 +30,11 @@ void crossEyes()
         }
         break;
     case 3:
-        pupilR = pupilR << 1;
+        pupilR = pupilR >> 1;
         setRow(0, 3, pupilR ^ B11111111);
         setRow(0, 4, pupilR ^ B11111111);
 #if (EYEBALL_CNT == 2)
-        pupilL = pupilL >> 1;
+        pupilL = pupilL << 1;
         setRow(1, 3, pupilL ^ B11111111);
         setRow(1, 4, pupilL ^ B11111111);
 #endif

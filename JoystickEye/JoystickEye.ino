@@ -16,7 +16,7 @@
 
 /* Animate constance */
 #define ANIM_IVL 2000
-#define ANIM_IDX_MAX 3
+#define ANIM_IDX_MAX 4
 #define ANIM_MOVE   99
 
 /* define eyeball count */
@@ -29,7 +29,7 @@
 LedControl lc = LedControl(PIN_EYES_DIN, PIN_EYES_CLK, PIN_EYES_CS, EYEBALL_CNT);
 /* rotation */
 bool rotateMatrix0 = false; /* rotate 0 matrix by 180 deg */
-bool rotateMatrix1 = false; /* rotate 1 matrix by 180 deg */
+bool rotateMatrix1 = false;  /* mirror */ /* rotate 1 matrix by 180 deg */
 /* define eye ball without pupil */
 byte eyeBall[8]={
     B00111100,
@@ -69,6 +69,9 @@ int animIndex = -1;
 
 boolean blinkLeft = false;
 boolean blinkRight = false;
+/* Cross/meth eyes used */
+byte pupilR = eyePupil;
+byte pupilL = eyePupil;
 
 /* Arduino setup */
 void setup()
@@ -171,6 +174,9 @@ void loop()
             case 3:
                 crossEyes();
                 break;
+            case 4:
+                methEyes();
+                break;
             case ANIM_MOVE:
                 moveEyesLoop();
                 break;
@@ -263,7 +269,7 @@ void setRow(int addr, int row, byte rowValue)
 {
     if (((addr == 0) && (rotateMatrix0)) || (addr == 1 && rotateMatrix1))
     {
-        row = abs(row - 7);
+        /* row = abs(row - 7); */
         rowValue = bitswap(rowValue);
     }
     lc.setRow(addr, row, rowValue);
