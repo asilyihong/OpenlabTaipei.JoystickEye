@@ -16,7 +16,7 @@
 
 /* Animate constance */
 #define ANIM_IVL 2000
-#define ANIM_IDX_MAX 4
+#define ANIM_IDX_MAX 6
 #define ANIM_MOVE   99
 
 /* define eyeball count */
@@ -175,7 +175,13 @@ void loop()
                 crossEyes();
                 break;
             case 4:
+                lazyEye();
+                break;
+            case 5:
                 methEyes();
+                break;
+            case 6:
+                glowEyes(3);
                 break;
             case ANIM_MOVE:
                 moveEyesLoop();
