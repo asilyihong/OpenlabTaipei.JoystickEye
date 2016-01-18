@@ -1,31 +1,8 @@
 /* We always have to include the LedControl library */
 #include <LedControl.h>
 #include <Serial.h>
-/*
-   Create LetControl object, define pin connections
-   We have 2 MAX72XX for eyes.
- */
-#define PIN_EYES_DIN 12
-#define PIN_EYES_CS  10
-#define PIN_EYES_CLK 11
 
-/* Joystick pin */
-#define X_PIN   A1
-#define Y_PIN   A0
-#define BTN_PIN  2
-
-/* Animate constance */
-#define ANIM_IVL 2000
-#define ANIM_IDX_MAX 6
-#define ANIM_MOVE   99
-
-/* define eyeball count */
-#define EYEBALL_CNT  2
-#if (EYEBALL_CNT == 2)
-# define MIN_ANIM    0
-#else
-# define MIN_ANIM    1
-#endif
+#include "JoystickEye.h"
 LedControl lc = LedControl(PIN_EYES_DIN, PIN_EYES_CLK, PIN_EYES_CS, EYEBALL_CNT);
 /* rotation */
 bool rotateMatrix0 = false; /* rotate 0 matrix by 180 deg */
@@ -89,9 +66,9 @@ void setup()
 #endif
     /* LED test vertical line */
     byte b = B10000000;
-    for (int c=0; c<=7; c++)
+    for (int c = 0; c <= 7; c++)
     {
-        for (int r=0; r<=7; r++)
+        for (int r = 0; r <= 7; r++)
         {
             setRow(0, r, b);
 #if (EYEBALL_CNT == 2)
@@ -103,7 +80,7 @@ void setup()
     }
     /* full module */
     b = B11111111;
-    for (int r=0; r<=7; r++)
+    for (int r = 0; r <= 7; r++)
     {
         setRow(0, r, b);
 #if (EYEBALL_CNT == 2)
@@ -156,31 +133,31 @@ void loop()
         {
             switch (animTypeIndex)
             {
-            case 0:
+            case ANIM_BLINK_RIGHT:
                 blinkLeft = false;
                 blinkRight = true;
                 blinkEyes();
                 break;
-            case 1:
+            case ANIM_BLINK_LEFT:
                 blinkLeft = true;
                 blinkRight = false;
                 blinkEyes();
                 break;
-            case 2:
+            case ANIM_BLINK_TWO:
                 blinkLeft = true;
                 blinkRight = true;
                 blinkEyes();
                 break;
-            case 3:
+            case ANIM_CROSS_EYES:
                 crossEyes();
                 break;
-            case 4:
+            case ANIM_LAZY_EYES:
                 lazyEye();
                 break;
-            case 5:
+            case ANIM_METH_EYES:
                 methEyes();
                 break;
-            case 6:
+            case ANIM_GLOW_EYES:
                 glowEyes(3);
                 break;
             case ANIM_MOVE:
@@ -244,7 +221,7 @@ void displayEyes(int offsetX, int offsetY)
     byte pupilRow1 = pupilRow & eyeBall[row1];
     byte pupilRow2 = pupilRow & eyeBall[row2];
     /* display on LCD matrix, update to eyeCurrent */
-    for(int r=0; r<8; r++)
+    for(int r = 0; r < 8; r++)
     {
         if (r == row1)
         {
@@ -320,7 +297,7 @@ void nextAnim()
         }
         animTypeIndex = currAnimTypeIndex;
     }
-    else if (animTypeIndex == 0)
+    else if (animTypeIndex == ANIM_BLINK_RIGHT)
     { /* blink right eye */
         nextAnimTime = currTime + 100;
         currAnimTypeIndex++;
