@@ -1,5 +1,14 @@
 #define DELAY_BLINK 40
 /* This method blinks eyes as per provided params */
+
+void blinkEyesInit(bool left, bool right)
+{
+    blinkLeft = left;
+    blinkRight = right;
+    animLvlIndex = 0;
+    animIndex = 0;
+}
+
 void blinkEyes()
 {
     switch(animLvlIndex)

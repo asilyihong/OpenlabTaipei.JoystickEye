@@ -21,25 +21,20 @@
 #define ANIM_IVL               2000
 
 /* Animate enum */
-#define ANIM_BLINK_RIGHT          0
-#define ANIM_BLINK_LEFT           1
-#define ANIM_BLINK_TWO            2
-#define ANIM_CROSS_EYES           3
-#define ANIM_LAZY_EYES            4
-#define ANIM_METH_EYES            5
-#define ANIM_GLOW_EYES            6
-#define ANIM_IDX_MAX              6
-#define ANIM_ROUND_SPIN           7
-#define ANIM_CRAZY_SPIN           8
-#define ANIM_HEART_EYES           9
+#define ANIM_BLINK_SINGLE         0
+#define ANIM_BLINK_TWO            1
+#define ANIM_CROSS_EYES           2
+#define ANIM_LAZY_EYES            3
+#define ANIM_METH_EYES            4
+#define ANIM_GLOW_EYES            5
+#define ANIM_ROUND_SPIN           6
+#define ANIM_CRAZY_SPIN           7
+#define ANIM_HEART_EYES           8
 #define ANIM_MOVE                99
+#define MIN_ANIM                  ANIM_BLINK_SINGLE
+#define ANIM_IDX_MAX              ANIM_GLOW_EYES
 
 /* define eyeball count */
 #define EYEBALL_CNT               2
-#if (EYEBALL_CNT == 2)
-# define MIN_ANIM ANIM_BLINK_RIGHT
-#else /* EYEBALL_CNT == 2 */
-# define MIN_ANIM ANIM_BLINK_LEFT
-#endif /* EYEBALL_CNT != 2 */
 
 #endif /* __JOYSTICK_KEY_H */ 

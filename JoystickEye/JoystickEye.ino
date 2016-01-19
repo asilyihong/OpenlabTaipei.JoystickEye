@@ -45,11 +45,11 @@ int animTypeIndex = -1;
 int animLvlIndex = -1;
 int animIndex = -1;
 
-boolean blinkLeft = false;
-boolean blinkRight = false;
 /* Cross/meth eyes used */
 byte pupilR = eyePupil;
 byte pupilL = eyePupil;
+boolean blinkLeft = false;
+boolean blinkRight = false;
 
 /* Arduino setup */
 void setup()
@@ -136,19 +136,10 @@ void loop()
         {
             switch (animTypeIndex)
             {
-            case ANIM_BLINK_RIGHT:
-                blinkLeft = false;
-                blinkRight = true;
-                blinkEyes();
-                break;
-            case ANIM_BLINK_LEFT:
-                blinkLeft = true;
-                blinkRight = false;
+            case ANIM_BLINK_SINGLE:
                 blinkEyes();
                 break;
             case ANIM_BLINK_TWO:
-                blinkLeft = true;
-                blinkRight = true;
                 blinkEyes();
                 break;
             case ANIM_CROSS_EYES:
@@ -283,12 +274,17 @@ byte bitswap (byte x)
 
 void startAnim()
 {
-        animMode = true;
-        currAnimTypeIndex = MIN_ANIM;
-        animTypeIndex = currAnimTypeIndex;
-        animLvlIndex = 0;
-        animIndex = 0;
-        nextAnimTime = currTime;
+    animMode = true;
+    currAnimTypeIndex = MIN_ANIM;
+    animTypeIndex = currAnimTypeIndex;
+    animLvlIndex = 0;
+    animIndex = 0;
+    nextAnimTime = currTime;
+#if (EYEBALL_CNT == 2)
+    blinkEyesInit(false, true);
+#else
+    blinkEyesInit(true, false);
+#endif
 }
 
 void nextAnim()
@@ -304,13 +300,29 @@ void nextAnim()
             currAnimTypeIndex = MIN_ANIM;
         }
         animTypeIndex = currAnimTypeIndex;
+        switch (animTypeIndex)
+        {
+        case ANIM_BLINK_SINGLE:
+#if (EYEBALL_CNT == 2)
+            blinkEyesInit(false, true);
+#else
+            blinkEyesInit(true, false);
+#endif
+            break;
+        case ANIM_BLINK_TWO:
+            blinkEyesInit(true, true);
+            break;
+        default:
+            break;
+        }
     }
-    else if (animTypeIndex == ANIM_BLINK_RIGHT)
+#if (EYEBALL_CNT == 2)
+    else if (animTypeIndex == ANIM_BLINK_SINGLE && (blinkLeft == false && blinkRight == true))
     { /* blink right eye */
+        blinkEyesInit(true, false);
         nextAnimTime = currTime + 100;
-        currAnimTypeIndex++;
-        animTypeIndex = currAnimTypeIndex;
     }
+#endif
     else
     {
         nextAnimTime = currTime + 500 + random(ANIM_IVL);
