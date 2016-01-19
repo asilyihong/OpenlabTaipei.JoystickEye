@@ -22,19 +22,24 @@
 
 /* Animate enum */
 #define ANIM_BLINK_SINGLE         0
-#define ANIM_BLINK_TWO            1
-#define ANIM_CROSS_EYES           2
-#define ANIM_LAZY_EYES            3
-#define ANIM_METH_EYES            4
-#define ANIM_GLOW_EYES            5
-#define ANIM_ROUND_SPIN           6
-#define ANIM_CRAZY_SPIN           7
+#define ANIM_ROUND_SPIN           1
+#define ANIM_CRAZY_SPIN           2
+#define ANIM_BLINK_TWO            3
+#define ANIM_CROSS_EYES           4
+#define ANIM_LAZY_EYES            5
+#define ANIM_METH_EYES            6
+#define ANIM_GLOW_EYES            7
 #define ANIM_HEART_EYES           8
 #define ANIM_MOVE                99
-#define MIN_ANIM                  ANIM_BLINK_SINGLE
+#define ANIM_IDX_MIN              ANIM_BLINK_SINGLE
 #define ANIM_IDX_MAX              ANIM_GLOW_EYES
 
 /* define eyeball count */
 #define EYEBALL_CNT               2
 
+typedef struct _Coordinate_t
+{
+    int     x;
+    int     y;
+} Coordinate_t;
 #endif /* __JOYSTICK_KEY_H */ 

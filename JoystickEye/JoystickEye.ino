@@ -44,6 +44,9 @@ int currAnimTypeIndex = -1;
 int animTypeIndex = -1;
 int animLvlIndex = -1;
 int animIndex = -1;
+int animReTimes = 0;
+int specialDelay = 0;
+int currReTime = 0;
 
 /* Cross/meth eyes used */
 byte pupilR = eyePupil;
@@ -142,6 +145,9 @@ void loop()
             case ANIM_BLINK_TWO:
                 blinkEyes();
                 break;
+            case ANIM_CRAZY_SPIN:
+                crazySpin();
+                break;
             case ANIM_CROSS_EYES:
                 crossEyes();
                 break;
@@ -156,6 +162,9 @@ void loop()
                 break;
             case ANIM_MOVE:
                 moveEyesLoop();
+                break;
+            case ANIM_ROUND_SPIN:
+                roundSpin();
                 break;
             default:
                 break;
@@ -275,7 +284,7 @@ byte bitswap (byte x)
 void startAnim()
 {
     animMode = true;
-    currAnimTypeIndex = MIN_ANIM;
+    currAnimTypeIndex = ANIM_IDX_MIN;
     animTypeIndex = currAnimTypeIndex;
     animLvlIndex = 0;
     animIndex = 0;
@@ -297,7 +306,7 @@ void nextAnim()
         nextAnimTime = currTime + 500 + random(ANIM_IVL);
         if (currAnimTypeIndex > ANIM_IDX_MAX)
         {
-            currAnimTypeIndex = MIN_ANIM;
+            currAnimTypeIndex = ANIM_IDX_MIN;
         }
         animTypeIndex = currAnimTypeIndex;
         switch (animTypeIndex)
@@ -311,6 +320,12 @@ void nextAnim()
             break;
         case ANIM_BLINK_TWO:
             blinkEyesInit(true, true);
+            break;
+        case ANIM_ROUND_SPIN:
+            roundSpinInit(3);
+            break;
+        case ANIM_CRAZY_SPIN:
+            crazySpinInit(3);
             break;
         default:
             break;
