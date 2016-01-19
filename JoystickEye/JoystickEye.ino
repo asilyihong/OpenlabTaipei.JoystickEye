@@ -40,7 +40,6 @@ unsigned long lastMoveTime = 0;
 unsigned long nextAnimTime = 0;
 
 boolean animMode = false;
-int currAnimTypeIndex = -1;
 int animTypeIndex = -1;
 int animLvlIndex = -1;
 int animIndex = -1;
@@ -284,8 +283,7 @@ byte bitswap (byte x)
 void startAnim()
 {
     animMode = true;
-    currAnimTypeIndex = ANIM_IDX_MIN;
-    animTypeIndex = currAnimTypeIndex;
+    animTypeIndex = ANIM_IDX_MIN;
     animLvlIndex = 0;
     animIndex = 0;
     nextAnimTime = currTime;
@@ -302,13 +300,8 @@ void nextAnim()
     animLvlIndex = 0;
     if (animTypeIndex == ANIM_MOVE)
     {
-        currAnimTypeIndex++;
+        animTypeIndex = random(ANIM_IDX_MIN, ANIM_IDX_MAX + 1);
         nextAnimTime = currTime + 500 + random(ANIM_IVL);
-        if (currAnimTypeIndex > ANIM_IDX_MAX)
-        {
-            currAnimTypeIndex = ANIM_IDX_MIN;
-        }
-        animTypeIndex = currAnimTypeIndex;
         switch (animTypeIndex)
         {
         case ANIM_BLINK_SINGLE:
