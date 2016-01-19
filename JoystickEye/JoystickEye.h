@@ -14,6 +14,9 @@
 #define Y_PIN                    A0
 #define BTN_PIN                   2
 
+/* Demostaration mode */
+#define IDLE_IVL              30000 /* millsecond(s) */
+
 /* Animate constance */
 #define ANIM_IVL               2000
 
@@ -26,6 +29,9 @@
 #define ANIM_METH_EYES            5
 #define ANIM_GLOW_EYES            6
 #define ANIM_IDX_MAX              6
+#define ANIM_ROUND_SPIN           7
+#define ANIM_CRAZY_SPIN           8
+#define ANIM_HEART_EYES           9
 #define ANIM_MOVE                99
 
 /* define eyeball count */

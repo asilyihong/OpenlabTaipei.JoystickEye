@@ -36,6 +36,7 @@ int buttonState = 0;
 boolean noMove = false;
 
 unsigned long currTime = 0;
+unsigned long lastMoveTime = 0;
 unsigned long nextAnimTime = 0;
 
 boolean animMode = false;
@@ -109,6 +110,7 @@ void setup()
 
     delay(1000);
     currTime = millis();
+    lastMoveTime = currTime;
 }
 
 /* Arduino loop */
@@ -126,6 +128,7 @@ void loop()
         animMode = false;
         prevXPosition = xPosition;
         prevYPosition = yPosition;
+        lastMoveTime = currTime;
     }
     if (animMode)
     {
@@ -168,14 +171,9 @@ void loop()
             }
         }
     }
-    else if (!buttonState)
+    else if (!buttonState || currTime - lastMoveTime > IDLE_IVL)
     {
-        animMode = true;
-        currAnimTypeIndex = MIN_ANIM;
-        animTypeIndex = currAnimTypeIndex;
-        animLvlIndex = 0;
-        animIndex = 0;
-        nextAnimTime = currTime;
+        startAnim();
     } 
     else if (!noMove)
     {
@@ -281,6 +279,16 @@ byte bitswap (byte x)
             "ror %[out] \n\t"
             : [out] "=r" (result) : [in] "r" (x));
     return(result);
+}
+
+void startAnim()
+{
+        animMode = true;
+        currAnimTypeIndex = MIN_ANIM;
+        animTypeIndex = currAnimTypeIndex;
+        animLvlIndex = 0;
+        animIndex = 0;
+        nextAnimTime = currTime;
 }
 
 void nextAnim()
